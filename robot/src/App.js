@@ -4,8 +4,12 @@ import { v4 as uuidv4 } from 'uuid';
 import './App.css';
 
 // Dify API 配置
-const DIFY_API_URL = 'http://localhost/console/api';
-const DIFY_API_KEY = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpblR5cGUiOiJsb2dpbiIsImxvZ2luSWQiOiIxODg4MTUwMDk3ODcyNTEwOTc3Iiwicm5TdHIiOiJnUHZaSFdJYktQYmZ4elFFVWh1WDlpSUIwUlZHOTlURiIsInVzZXJJZCI6IjE4ODgxNTAwOTc4NzI1MTA5NzciLCJ0ZW5hbnRJZCI6MTczMDQ5MDExNzc4NzcwNTM0NH0.CxLKCo_Jv06J2YVb_D2BU2jhbbCAIQIdCK9hA0rkqSQ';
+const DIFY_API_URL = 'http://localhost/v1';
+const DIFY_API_KEY = 'app-RGN1grBSQREbnbP6p3h8UTm2'; // 应用的 API Key
+
+// 聊天工作流输入参数
+const DEFAULT_NETWORKING = 0; // 默认值
+const DEFAULT_AUTHORIZATION = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpblR5cGUiOiJsb2dpbiIsImxvZ2luSWQiOiIxODg4MTUwMDk3ODcyNTEwOTc3Iiwicm5TdHIiOiJYNElCOWprWm5LS0ZCb09vSG90STZwZWhBVzlTWGxKcSIsInVzZXJJZCI6IjE4ODgxNTAwOTc4NzI1MTA5NzciLCJ0ZW5hbnRJZCI6MTczMDQ5MDExNzc4NzcwNTM0NH0.nC3Nr_jdHZIoEH8V2r3FqMA5bjUrgC0yyClbFLC9r6s";
 
 function App() {
   const [messages, setMessages] = useState([]);
@@ -40,8 +44,12 @@ function App() {
     setIsLoading(true);
 
     try {
+      // 构建请求体，将 networking 和 Authorization 作为 inputs 参数传递
       const requestBody = {
-        inputs: {},
+        inputs: {
+          networking: DEFAULT_NETWORKING,
+          Authorization: DEFAULT_AUTHORIZATION  // 工作流需要的认证参数
+        },
         query: message,
         response_mode: 'blocking',
         user: 'chatbot-user'
@@ -57,7 +65,7 @@ function App() {
         requestBody,
         {
           headers: {
-            'Authorization': `Bearer ${DIFY_API_KEY}`,
+            'Authorization': `Bearer ${DIFY_API_KEY}`,  // HTTP Header 也需要
             'Content-Type': 'application/json'
           }
         }
@@ -80,9 +88,9 @@ function App() {
     } catch (error) {
       console.error('Error sending message:', error);
       console.error('Error details:', error.response?.data);
-      
+
       const errorMsg = error.response?.data?.message || '连接 Dify 服务时出现问题';
-      
+
       // 添加错误消息
       const errorMessage = {
         id: uuidv4(),
